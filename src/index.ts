@@ -5,7 +5,7 @@ import { Rcon } from "rcon-client/lib";
 import { delay, Subject, take } from "rxjs";
 import { registerCommands } from "./discord-commands";
 import { createThread, discordClient, simpleEmbeddedResponse } from "./discord-utils";
-import { banPlayer, demotePlayer, doesPlayerExist, FeedScience, getConnectedPlayers, getJailList, getSpecificPlayer, getTrustList, isPlayerAlreadyTrustedAssert, isPlayerAlreadyUntrustedAssert, promotePlayer, ScienceType, trustPlayer, unbanPlayer, untrustPlayer } from "./factorio-utils";
+import { banPlayer, demotePlayer, doesPlayerExist, FeedScience, getConnectedPlayers, getJailList, getSpecificPlayer, getTrustList, isPlayerAlreadyJailedAssert, isPlayerAlreadyTrustedAssert, isPlayerAlreadyUnjailedAssert, isPlayerAlreadyUntrustedAssert, jailPlayer, promotePlayer, ScienceType, trustPlayer, unbanPlayer, unjailPlayer, untrustPlayer } from "./factorio-utils";
 import { playerEvents, players, PlayerState } from "./player-observables";
 import { readStreamObservable } from "./tail";
 import { Command, Force } from "./types";
@@ -280,27 +280,27 @@ discordClient.on('interactionCreate', async interaction => {
       await interaction.reply(`***\`\`\`Player ${playerName} is now un-baned.\`\`\`***`);
       break;
     }
-    // case Command.jail: {
-    //   const playerName = interaction.options.getString('player');
-    //   const reason = interaction.options.getString('reason');
-    //   if (playerName == null || reason == null) return;
-    //   if (!await doesPlayerExist({ playerName, interaction })) return;
-    //   if (await isPlayerAlreadyJailedAssert({ playerName, interaction })) return;
-    //   await simpleEmbeddedResponse({ interaction, message: `${interaction.user.username} invoked command ${Command.jail}`, command: Command.jail })
-    //   await jailPlayer({ playerName, reason });
-    //   await interaction.reply(`***\`\`\`Player ${playerName} is now jailed.\`\`\`***`);
-    //   break;
-    // }
-    // case Command.free: {
-    //     const playerName = interaction.options.getString('player');
-    //   if (playerName == null) return;
-    //   if (!await doesPlayerExist({ playerName, interaction })) return;
-    //   if (await isPlayerAlreadyUnjailedAssert({ playerName, interaction })) return;
-    //   await simpleEmbeddedResponse({ interaction, message: `${interaction.user.username} invoked command ${Command.free}`, command: Command.free })
-    //   await unjailPlayer({ playerName });
-    //   await interaction.reply(`***\`\`\`Player ${playerName} is now un-jailed.\`\`\`***`);
-    //   break;
-    // }
+    case Command.jail: {
+      const playerName = interaction.options.getString('player');
+      const reason = interaction.options.getString('reason');
+      if (playerName == null || reason == null) return;
+      if (!await doesPlayerExist({ playerName, interaction })) return;
+      if (await isPlayerAlreadyJailedAssert({ playerName, interaction })) return;
+      await simpleEmbeddedResponse({ interaction, message: `${interaction.user.username} invoked command ${Command.jail}`, command: Command.jail })
+      await jailPlayer({ playerName, reason });
+      await interaction.reply(`***\`\`\`Player ${playerName} is now jailed.\`\`\`***`);
+      break;
+    }
+    case Command.free: {
+        const playerName = interaction.options.getString('player');
+      if (playerName == null) return;
+      if (!await doesPlayerExist({ playerName, interaction })) return;
+      if (await isPlayerAlreadyUnjailedAssert({ playerName, interaction })) return;
+      await simpleEmbeddedResponse({ interaction, message: `${interaction.user.username} invoked command ${Command.free}`, command: Command.free })
+      await unjailPlayer({ playerName });
+      await interaction.reply(`***\`\`\`Player ${playerName} is now un-jailed.\`\`\`***`);
+      break;
+    }
     case Command.promote: {
       const playerName = interaction.options.getString('player');
       if (playerName == null) return;
